@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 Operations — Page 10 · The Autonomous Seller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --ink:#0E0D0B;--ink-2:#1A1916;--ink-3:#252420;--ink-4:#2E2F28;
+  --cream:#F5F0E8;--cream-2:#EDE8DC;--cream-3:#E3DDD0;
+  --gold:#B8960C;--gold-lt:#D4AC1A;--gold-dim:rgba(184,150,12,0.14);
+  --rule:rgba(14,13,11,0.10);--rule-lt:rgba(14,13,11,0.05);
+  --white:#FDFAF4;
+  --text:#1A1916;--text-2:#4A4840;--text-3:#7A7668;
+  --mono:'IBM Plex Mono',monospace;--display:'Syne',sans-serif;--serif:'Cormorant Garamond',Georgia,serif;
+  --blue:#1557B0;--blue-lt:#E8F0FE;--blue-dk:#0D3D80;
+  --green:#0D5226;--green-lt:#E6F4EA;--green-dk:#083D1A;
+  --amber:#7A4100;--amber-lt:#FEF3E2;--amber-dk:#4D2800;
+  --red:#A50E0E;--red-lt:#FCE8E6;--red-dk:#7A0A0A;
+  --teal:#005F67;--teal-lt:#E4F7F7;
+  --purple:#3700B3;--purple-lt:#EDE7F6;
+  --col:56px;
+}
+body{font-family:var(--display);background:var(--cream);color:var(--text);overflow-x:hidden;cursor:none}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E")}
+#cur{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .15s,height .15s}
+#cur-r{position:fixed;top:0;left:0;width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.35;transition:width .25s,height .25s}
+body:has(a:hover) #cur{width:13px;height:13px}
+body:has(a:hover) #cur-r{width:44px;height:44px;opacity:.18}
+
+/* ── NAV ── */
+.mnav{position:fixed;top:0;left:0;right:0;z-index:600;display:flex;align-items:center;justify-content:space-between;padding:15px var(--col);background:rgba(245,240,232,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule)}
+.mn-l{display:flex;align-items:center;gap:14px}
+.mn-back{font-family:var(--mono);font-size:11px;color:var(--text-2);text-decoration:none;letter-spacing:.05em;transition:color .2s}.mn-back:hover{color:var(--gold)}
+.mn-sep{width:1px;height:14px;background:var(--rule)}
+.mn-crumb{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.04em}.mn-crumb strong{color:var(--text);font-weight:500}
+.mn-r{display:flex;align-items:center;gap:20px}
+.mn-link{font-family:var(--mono);font-size:11px;color:var(--text-2);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}.mn-link:hover{color:var(--gold)}
+.mn-gh{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--cream);background:var(--ink);text-decoration:none;padding:7px 16px;letter-spacing:.06em;text-transform:uppercase;transition:background .2s}.mn-gh:hover{background:var(--gold)}
+
+/* ── SECTION NAV ── */
+.snav{position:sticky;top:52px;z-index:500;background:rgba(245,240,232,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);padding:0 var(--col);display:flex;overflow-x:auto;scrollbar-width:none}
+.snav::-webkit-scrollbar{display:none}
+.sn{font-family:var(--mono);font-size:11px;color:var(--text-3);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;padding:11px 18px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .18s,border-color .18s}
+.sn:hover{color:var(--gold)}.sn.act{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
+
+/* ── PAGE HEADER ── */
+.phdr{background:var(--ink);padding:80px var(--col) 60px;margin-top:88px;position:relative;overflow:hidden}
+.phdr::before{content:'10';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-family:var(--display);font-size:220px;font-weight:800;color:rgba(255,255,255,.025);letter-spacing:-.05em;line-height:1;pointer-events:none;user-select:none}
+.ph-bc{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ph-bc span{color:rgba(245,240,232,.18)}
+.ph-h1{font-family:var(--serif);font-size:clamp(32px,4.8vw,58px);font-weight:300;color:var(--cream);line-height:1.05;margin-bottom:14px}
+.ph-h1 strong{font-weight:600}.ph-h1 em{font-style:italic;color:var(--gold)}
+.ph-sub{font-family:var(--mono);font-size:13px;font-weight:300;color:rgba(245,240,232,.48);line-height:1.75;max-width:640px}
+.ph-tags{display:flex;gap:8px;margin-top:28px;flex-wrap:wrap}
+.ph-tag{font-family:var(--mono);font-size:10px;padding:4px 11px;border:1px solid rgba(255,255,255,.14);color:rgba(245,240,232,.65);letter-spacing:.06em}
+
+/* ── SECTIONS ── */
+.sec{padding:64px var(--col);background:var(--cream)}
+.sec.alt{background:var(--cream-2)}
+.sec.dk{background:var(--ink);padding:64px var(--col)}
+.s-ey{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.s-ey::before{content:'';display:block;width:18px;height:1px;background:currentColor}
+.s-ey.gr{color:var(--green)}.s-ey.am{color:var(--amber)}.s-ey.re{color:var(--red)}.s-ey.pu{color:var(--purple)}.s-ey.te{color:var(--teal)}
+.sec.dk .s-ey{color:var(--gold-lt)}
+.s-h2{font-family:var(--serif);font-size:clamp(26px,3.2vw,40px);font-weight:300;color:var(--ink);line-height:1.1;margin-bottom:10px}
+.s-h2 strong{font-weight:600}.s-h2 em{font-style:italic;color:var(--gold)}
+.sec.dk .s-h2{color:var(--cream)}
+.s-p{font-family:var(--mono);font-size:13px;font-weight:300;color:var(--text-2);line-height:1.85;max-width:680px;margin-bottom:36px}
+.sec.dk .s-p{color:rgba(245,240,232,.5)}
+.ap{opacity:0;transform:translateY(14px);transition:opacity .65s ease,transform .65s ease}
+.ap.in{opacity:1;transform:none}
+
+/* ── SLO TABLE ── */
+table.slo{width:100%;border-collapse:collapse}
+table.slo th{background:var(--ink);color:rgba(245,240,232,.45);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;text-align:left;border-right:1px solid rgba(255,255,255,.06)}
+table.slo th:last-child{border-right:none}
+table.slo td{padding:11px 14px;font-family:var(--mono);font-size:11px;color:var(--text);border-bottom:1px solid var(--rule-lt);border-right:1px solid var(--rule-lt);vertical-align:top;font-weight:300;line-height:1.5}
+table.slo td:last-child{border-right:none}
+table.slo tr:last-child td{border-bottom:none}
+table.slo tr:hover td{background:var(--cream-2)}
+.slo-good{color:var(--green);font-weight:500}
+.slo-warn{color:var(--amber);font-weight:500}
+.slo-crit{color:var(--red);font-weight:500}
+.slo-mod{font-family:var(--mono);font-size:9px;font-weight:500;padding:1px 5px;letter-spacing:.06em}
+.mod-c{background:#E8F0FE;color:#1557B0}
+.mod-f{background:#E4F7F7;color:#005F67}
+.mod-o{background:#E6F4EA;color:#0D5226}
+.mod-p{background:#FEF3E2;color:#7A4100}
+
+/* ── ALERT ROUTING MATRIX ── */
+.alert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px}
+.al-card{padding:20px;border:1px solid var(--rule);transition:background .2s}
+.al-card:hover{background:var(--white)}
+.al-card.p0{background:var(--red-lt);border-color:rgba(165,10,14,.2);border-left:4px solid var(--red)}
+.al-card.p1{background:var(--amber-lt);border-color:rgba(122,65,0,.2);border-left:4px solid var(--amber)}
+.al-card.p2{background:var(--blue-lt);border-color:rgba(21,87,176,.2);border-left:4px solid var(--blue)}
+.al-card.p3{background:var(--cream-2);border-left:4px solid var(--rule)}
+.al-sev{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.al-card.p0 .al-sev{color:var(--red)}
+.al-card.p1 .al-sev{color:var(--amber)}
+.al-card.p2 .al-sev{color:var(--blue)}
+.al-card.p3 .al-sev{color:var(--text-3)}
+.al-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.01em;line-height:1.2}
+.al-triggers{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.7;margin-bottom:10px}
+.al-action{font-family:var(--mono);font-size:10px;color:var(--text-3);border-top:1px solid var(--rule-lt);padding-top:10px;line-height:1.6}
+.al-action strong{color:var(--text-2);font-weight:500}
+
+/* ── MODEL GOVERNANCE CALENDAR ── */
+table.gc{width:100%;border-collapse:collapse}
+table.gc th{background:var(--ink);color:rgba(245,240,232,.45);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;text-align:left;border-right:1px solid rgba(255,255,255,.06)}
+table.gc th:last-child{border-right:none}
+table.gc td{padding:11px 14px;font-family:var(--mono);font-size:11px;color:var(--text);border-bottom:1px solid var(--rule-lt);border-right:1px solid var(--rule-lt);vertical-align:top;font-weight:300;line-height:1.5}
+table.gc td:last-child{border-right:none}
+table.gc tr:last-child td{border-bottom:none}
+table.gc tr:hover td{background:var(--cream-2)}
+.gc-cadence{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;letter-spacing:.06em}
+.gc-weekly{background:#E6F4EA;color:#0D5226}
+.gc-monthly{background:#E8F0FE;color:#1557B0}
+.gc-quarterly{background:#FEF3E2;color:#7A4100}
+
+/* ── RUNBOOK STEPS ── */
+.runbook{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.rb-step{background:var(--cream-2);border:1px solid var(--rule);padding:20px 24px;display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:flex-start;transition:background .2s}
+.rb-step:hover{background:var(--white)}
+.rb-num{font-family:var(--display);font-size:22px;font-weight:800;color:var(--gold);letter-spacing:-.02em;line-height:1}
+.rb-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em}
+.rb-body{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.7}
+.rb-slo{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--amber);margin-top:6px;letter-spacing:.04em}
+
+/* ── CHAOS CARDS ── */
+.chaos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.chaos-card{background:var(--ink-3);border:1px solid rgba(255,255,255,.07);padding:20px}
+.cc-label{font-family:var(--mono);font-size:10px;font-weight:500;color:rgba(217,48,37,.6);letter-spacing:.09em;text-transform:uppercase;margin-bottom:8px}
+.cc-cadence{font-family:var(--mono);font-size:10px;font-weight:500;color:rgba(212,172,26,.5);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.cc-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--cream);margin-bottom:8px;letter-spacing:-.01em;line-height:1.2}
+.cc-scenario{font-family:var(--mono);font-size:11px;font-weight:300;color:rgba(245,240,232,.5);line-height:1.65;margin-bottom:8px}
+.cc-expect{font-family:var(--mono);font-size:10px;color:rgba(165,214,167,.7);line-height:1.5}
+.cc-expect strong{font-weight:500}
+
+/* ── ADR ── */
+.adr-single{background:var(--cream-2);border:1px solid var(--rule);border-left:4px solid var(--gold);padding:28px;margin-top:4px}
+.adr-id{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.adr-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:20px;letter-spacing:-.01em;line-height:1.2}
+.adr-section{font-family:var(--mono);font-size:9px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:14px;margin-bottom:5px}
+.adr-text{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.7}
+.adr-rejected{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--red-dk);line-height:1.7}
+.adr-status{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;background:var(--green-lt);color:var(--green-dk);letter-spacing:.06em;margin-top:14px}
+
+/* ── BRIDGE / FOOTER ── */
+.bridge{padding:64px var(--col);background:var(--ink);display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.br-label{font-family:var(--mono);font-size:10px;color:var(--gold-lt);letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.br-label::before{content:'';display:block;width:18px;height:1px;background:var(--gold-lt)}
+.br-h{font-family:var(--serif);font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--cream);line-height:1.15;margin-bottom:16px}
+.br-h strong{font-weight:600}
+.br-p{font-family:var(--mono);font-size:12px;font-weight:300;color:rgba(245,240,232,.48);line-height:1.85}
+.pages{display:flex;flex-direction:column;gap:3px}
+.pg-link{display:grid;grid-template-columns:52px 1fr 20px;align-items:center;gap:12px;padding:16px 20px;background:var(--ink-2);text-decoration:none;border:1px solid transparent;transition:background .18s,border-color .18s,transform .18s}
+.pg-link:hover{background:var(--ink-3);border-color:rgba(255,255,255,.08);transform:translateX(4px)}
+.pl-n{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.07em}
+.pl-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--cream);letter-spacing:-.01em}
+.pl-sub{font-family:var(--mono);font-size:10px;font-weight:300;color:rgba(245,240,232,.35);margin-top:2px}
+.pl-arr{font-family:var(--mono);font-size:13px;color:rgba(245,240,232,.3);transition:color .18s,transform .18s}
+.pg-link:hover .pl-arr{color:var(--gold);transform:translateX(3px)}
+footer{background:var(--ink-2);padding:28px var(--col);border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ft-brand{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--cream)}
+.ft-brand em{font-style:italic;color:var(--gold)}
+.ft-copy{font-family:var(--mono);font-size:11px;color:rgba(245,240,232,.2);letter-spacing:.03em}
+
+@media(max-width:1100px){:root{--col:32px}}
+@media(max-width:860px){
+  :root{--col:22px}
+  .alert-grid{grid-template-columns:1fr 1fr}
+  .chaos-grid{grid-template-columns:1fr}
+  .bridge{grid-template-columns:1fr}
+  .mn-r .mn-link{display:none}
+}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- ── MAIN NAV ── -->
+<nav class="mnav">
+  <div class="mn-l">
+    <a href="page-09.html" class="mn-back">← Page 09</a>
+    <div class="mn-sep"></div>
+    <div class="mn-crumb">The Autonomous Seller &nbsp;/&nbsp; <strong>Page 10 — Day 2 Operations</strong></div>
+  </div>
+  <div class="mn-r">
+    <a href="index.html" class="mn-link">Overview</a>
+    <a href="page-09.html" class="mn-link">← Page 09</a>
+    <a href="https://github.com/raosiddharthp/The-Autonomous-Enterprise" target="_blank" class="mn-gh">GitHub →</a>
+  </div>
+</nav>
+
+<!-- ── SECTION NAV ── -->
+<nav class="snav" id="snav">
+  <a href="#slos" class="sn act" data-sec="slos">Cross-Module SLOs</a>
+  <a href="#alerts" class="sn" data-sec="alerts">Alert Routing</a>
+  <a href="#governance" class="sn" data-sec="governance">Model Governance</a>
+  <a href="#runbook" class="sn" data-sec="runbook">On-Call Runbook</a>
+  <a href="#chaos" class="sn" data-sec="chaos">Chaos Cadence</a>
+  <a href="#adr" class="sn" data-sec="adr">ADR</a>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<header class="phdr">
+  <div class="ph-bc">The Autonomous Seller <span>/</span> Page 10</div>
+  <h1 class="ph-h1">Day 2<br><em>Operations</em><br><strong>— TOGAF Phase H.</strong></h1>
+  <p class="ph-sub">Pages 01–09 design and deploy the AS. This page answers what happens next. Phase H (Architecture Change Management) at the suite level — cross-module SLO interactions, alert routing across all 11 HITL checkpoints, model governance calendar, on-call runbook, and the quarterly chaos engineering cadence that proves the system is as resilient as it is specified to be.</p>
+  <div class="ph-tags">
+    <span class="ph-tag">TOGAF Phase H</span>
+    <span class="ph-tag">Cross-Module SLOs</span>
+    <span class="ph-tag">11 HITL Checkpoints</span>
+    <span class="ph-tag">Model Governance Calendar</span>
+    <span class="ph-tag">Chaos Engineering Cadence</span>
+    <span class="ph-tag">ADR-017</span>
+  </div>
+</header>
+
+<!-- ── §01 CROSS-MODULE SLO DASHBOARD ── -->
+<section class="sec ap" id="slos">
+  <div class="s-ey">Cross-Module SLOs</div>
+  <h2 class="s-h2">Eight modules. One operational <em>posture.</em></h2>
+  <p class="s-p">Page 07 defined per-module SLOs for infrastructure. This table extends those definitions to cover the full AS Suite post go-live — including the cross-module burn rate interactions that only become visible when all eight modules are running simultaneously. The audit trail SLO at 99.99% is the anchor that constrains all other error budget decisions.</p>
+
+  <div style="overflow-x:auto;margin-top:4px" class="ap">
+    <table class="slo">
+      <thead><tr>
+        <th style="width:150px">Module</th>
+        <th style="width:60px">Domain</th>
+        <th style="width:200px">SLI — what is measured</th>
+        <th style="width:90px">SLO Target</th>
+        <th style="width:110px">Error Budget (30d)</th>
+        <th>Burn Rate Alert</th>
+        <th style="width:130px">Cross-module interaction</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:500">CCAI Sales Agent</td>
+          <td><span class="slo-mod mod-c">Commercial</span></td>
+          <td>% requests returning 2xx within 8s</td>
+          <td class="slo-good">99.5%</td>
+          <td>3.6 hours</td>
+          <td class="slo-warn">14.4× over 1h</td>
+          <td>Outage routes inbound inquiries to AE directly — graceful degradation with no downstream module dependency</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">ContractGuard</td>
+          <td><span class="slo-mod mod-c">Commercial</span></td>
+          <td>% analyses completing without error within 120s</td>
+          <td class="slo-good">99.0%</td>
+          <td>7.2 hours</td>
+          <td class="slo-warn">6× over 6h</td>
+          <td>Outage: RevRec AI falls back to reading contract data directly from Salesforce — reduced feature richness, fully operational</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">RevRec AI</td>
+          <td><span class="slo-mod mod-f">Financial</span></td>
+          <td>% classifications completing + SHAP generated within 10s</td>
+          <td class="slo-good">99.9%</td>
+          <td>43 minutes</td>
+          <td class="slo-crit">36× over 1h — page immediately</td>
+          <td>Any classification failure blocks the SAP write by design. FinRisk Sentinel continues independently — no dependency. Strategy Dashboard loses RevRec panel data.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">FinRisk Sentinel</td>
+          <td><span class="slo-mod mod-f">Financial</span></td>
+          <td>% financial events scored within 5 minutes of ingestion</td>
+          <td class="slo-good">99.5%</td>
+          <td>3.6 hours</td>
+          <td class="slo-warn">14.4× over 1h</td>
+          <td>Outage during streaming lag: anomaly alerts stop. CFO and Finance Controller must monitor BigQuery directly. No impact on other modules.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">Asset IQ</td>
+          <td><span class="slo-mod mod-o">Operations</span></td>
+          <td>% daily prediction runs completing within 2h window</td>
+          <td class="slo-good">99.0%</td>
+          <td>7.2 hours</td>
+          <td class="slo-warn">6× over 6h</td>
+          <td>Daily run failure: next scheduled run is the recovery. Fleet anomaly detection pauses. GreenOps loses Asset IQ batch jobs to schedule — no other cross-module impact.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">GreenOps Platform</td>
+          <td><span class="slo-mod mod-o">Operations</span></td>
+          <td>% batch ML jobs scheduled to optimal carbon window within ±6h</td>
+          <td class="slo-good">95.0%</td>
+          <td>36 hours</td>
+          <td style="font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2)">Non-critical — alert at 50% budget burn</td>
+          <td>Outage: batch ML training runs immediately without carbon deferral. Financial and operational SLOs unaffected. ESG reporting loses carbon savings data for the affected window.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">Strategy Dashboard</td>
+          <td><span class="slo-mod mod-p">Platform</span></td>
+          <td>% dashboard panels rendering with data &lt;60s stale</td>
+          <td class="slo-good">99.0%</td>
+          <td>7.2 hours</td>
+          <td class="slo-warn">6× over 6h</td>
+          <td>Read-only. Dashboard outage has zero impact on any operational module. CTO and CFO fall back to direct BigQuery queries during recovery window.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">HITL Framework</td>
+          <td><span class="slo-mod mod-p">Platform</span></td>
+          <td>% HITL checkpoints created and presented within 60s of trigger</td>
+          <td class="slo-good">99.9%</td>
+          <td>43 minutes</td>
+          <td class="slo-crit">36× over 1h — page immediately</td>
+          <td>Critical shared dependency. HITL failure blocks: RevRec AI SAP writes, ContractGuard counter-proposals, Asset IQ work orders, FinRisk CFO alerts. All modules degrade simultaneously. P0 regardless of which HITL checkpoint fails.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">Audit Trail</td>
+          <td><span class="slo-mod mod-p">Platform</span></td>
+          <td>% agent actions with audit record committed within 2s</td>
+          <td class="slo-good">99.99%</td>
+          <td>4 minutes</td>
+          <td class="slo-crit">Any failure = immediate page</td>
+          <td>The anchor SLO. A gap in the audit trail is a compliance event under EU AI Act Art. 12 — not an operational incident. All modules must halt non-essential operations until audit trail is restored. 4-minute error budget means there is effectively no tolerance for audit write failures.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cross-module burn rate interaction note -->
+  <div style="background:var(--gold-dim);border:1px solid var(--rule);border-left:3px solid var(--gold);padding:20px 24px;margin-top:4px" class="ap">
+    <div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--amber);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Critical cross-module burn rate interaction</div>
+    <div style="font-family:var(--mono);font-size:12px;font-weight:300;color:var(--text-2);line-height:1.75">If HITL Framework and Audit Trail burn simultaneously — the two platform SLOs with 36× and immediate page thresholds — the on-call responder must treat this as a P0 multi-module incident regardless of whether individual module SLOs are within budget. A HITL failure that also produces audit write gaps is a regulatory exposure, not just an operational one. The incident commander role activates automatically under this condition and cannot be delegated below Staff Engineer level.</div>
+  </div>
+</section>
+
+<!-- ── §02 ALERT ROUTING MATRIX ── -->
+<section class="sec alt ap" id="alerts">
+  <div class="s-ey re">Alert Routing Matrix</div>
+  <h2 class="s-h2">Every HITL breach. Every SLO burn. <em>One routing decision.</em></h2>
+  <p class="s-p">A cross-module view of what triggers each alert priority, who receives it, what the expected response is, and the SLA for that response. This matrix covers both infrastructure alerts (from page 07) and HITL-specific operational alerts that only emerge once all modules are live simultaneously.</p>
+
+  <div class="alert-grid ap">
+    <div class="al-card p0">
+      <div class="al-sev">P0 — Immediate page</div>
+      <div class="al-title">Compliance-affecting failure</div>
+      <div class="al-triggers">
+        · Audit trail write failure (any module)<br>
+        · HITL framework creation failure (any checkpoint)<br>
+        · RevRec AI HITL creation failure — SAP write blocked<br>
+        · VPC-SC perimeter breach attempt<br>
+        · SCC CRITICAL security finding<br>
+        · HITL Framework + Audit Trail simultaneous burn
+      </div>
+      <div class="al-action">
+        <strong>Receives:</strong> On-call SRE + ML Lead + Incident Commander (Staff Eng+)<br>
+        <strong>SLA:</strong> Acknowledge within 5 minutes · incident declared within 10<br>
+        <strong>EU AI Act:</strong> Any P0 involving audit or HITL must be logged as a compliance incident — documented in Firestore incident record before resolution
+      </div>
+    </div>
+
+    <div class="al-card p1">
+      <div class="al-sev">P1 — Page within 15 min</div>
+      <div class="al-title">Business-critical degradation</div>
+      <div class="al-triggers">
+        · HITL SLA breach across ≥2 modules simultaneously<br>
+        · FinRisk Sentinel streaming lag &gt;10 minutes<br>
+        · Circuit breaker open on Orchestrator (all agents affected)<br>
+        · RevRec AI error budget &gt;50% burned in &lt;6h<br>
+        · HITL override rate spike &gt;30% in any module (30-min window)<br>
+        · Asset IQ daily run missed by &gt;2 hours
+      </div>
+      <div class="al-action">
+        <strong>Receives:</strong> On-call SRE + module owner<br>
+        <strong>SLA:</strong> Acknowledge within 15 minutes · root cause within 1 hour<br>
+        <strong>Note:</strong> HITL override rate spike may indicate model drift before Vertex AI Monitoring detects it — route immediately to ML Lead even if infrastructure is healthy
+      </div>
+    </div>
+
+    <div class="al-card p2">
+      <div class="al-sev">P2 — Notify within 1 hour</div>
+      <div class="al-title">Elevated risk — monitor closely</div>
+      <div class="al-triggers">
+        · Error budget burn rate &gt;14.4× on any module (1h window)<br>
+        · SCC HIGH security finding<br>
+        · Model drift alert from Vertex AI Monitoring (any model)<br>
+        · HITL override rate &gt;15% sustained over 30-day window<br>
+        · CMEK key rotation failure<br>
+        · Budget alert at 80% of monthly allocation
+      </div>
+      <div class="al-action">
+        <strong>Receives:</strong> On-call SRE (notification only, no page)<br>
+        <strong>SLA:</strong> Acknowledge within 1 hour · remediation plan within 4 hours<br>
+        <strong>HITL override rate:</strong> If sustained above 15% → trigger HITL-10 retraining review regardless of whether drift detection has fired
+      </div>
+    </div>
+
+    <div class="al-card p3">
+      <div class="al-sev">P3 — Next business day</div>
+      <div class="al-title">Operational awareness items</div>
+      <div class="al-triggers">
+        · Budget alert at 50% of monthly allocation<br>
+        · GreenOps scheduling missed carbon window (&gt;25% of jobs)<br>
+        · CCAI Sales Agent elevated P99 latency (&gt;6s)<br>
+        · SCC MEDIUM finding<br>
+        · Data Governance quarantine rate &gt;2% of daily ingestion<br>
+        · Feature Store PSI warning (&gt;0.1, below alert threshold of 0.2)
+      </div>
+      <div class="al-action">
+        <strong>Receives:</strong> Slack notification to #as-ops channel<br>
+        <strong>SLA:</strong> Review at next standup · remediation within 5 business days<br>
+        <strong>Data Governance quarantine rate:</strong> Early warning for schema drift — review before it triggers the PSI alert threshold
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §03 MODEL GOVERNANCE CALENDAR ── -->
+<section class="sec ap" id="governance">
+  <div class="s-ey gr">Model Governance Calendar</div>
+  <h2 class="s-h2">Five models. One governance <em>cadence.</em></h2>
+  <p class="s-p">Model governance is not a deployment-time activity. Every model in the AS Suite has a recurring governance cadence — the scheduled events that keep each model compliant, well-calibrated, and trusted by the humans who approve its outputs. This calendar makes the governance posture operational, not aspirational.</p>
+
+  <div style="overflow-x:auto;margin-top:4px" class="ap">
+    <table class="gc">
+      <thead><tr>
+        <th style="width:150px">Model</th>
+        <th style="width:100px">Event</th>
+        <th style="width:90px">Cadence</th>
+        <th style="width:120px">Trigger condition</th>
+        <th>What is reviewed</th>
+        <th style="width:110px">Owner · Gate</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:500" rowspan="4">RevRec AI<br><span style="font-weight:300;font-size:10px;color:var(--text-3)">ASC 606 Classifier</span></td>
+          <td>Drift check</td>
+          <td><span class="gc-cadence gc-weekly">Weekly</span></td>
+          <td>Scheduled · automatic</td>
+          <td>PSI per feature vs training baseline · KL divergence on prediction distribution · HITL override rate in 30-day window vs previous 30 days</td>
+          <td>ML Engineer · automated</td>
+        </tr>
+        <tr>
+          <td>SHAP stability</td>
+          <td><span class="gc-cadence gc-monthly">Monthly</span></td>
+          <td>After each retraining cycle</td>
+          <td>Spearman rank correlation of top-10 SHAP features vs previous production model. Alert if ρ &lt; 0.70 — feature importance drift HITL-10 triggered.</td>
+          <td>ML Engineer · HITL-10</td>
+        </tr>
+        <tr>
+          <td>Model Card update</td>
+          <td><span class="gc-cadence gc-monthly">Monthly</span></td>
+          <td>After HITL-11 promotion</td>
+          <td>Evaluation metrics vs previous version · bias analysis refresh · HITL override decision dataset incorporated · ECE recalculated</td>
+          <td>ML Lead · HITL-11</td>
+        </tr>
+        <tr>
+          <td>EU AI Act review</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>Scheduled · Q1/Q2/Q3/Q4</td>
+          <td>Full Article 9 risk management review · Art. 13 SHAP faithfulness test · Art. 14 HITL checkpoint audit · Model Card completeness check</td>
+          <td>Compliance Officer · CCO sign-off</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500" rowspan="3">Asset IQ RUL<br><span style="font-weight:300;font-size:10px;color:var(--text-3)">RUL Regressor</span></td>
+          <td>Drift check</td>
+          <td><span class="gc-cadence gc-weekly">Weekly</span></td>
+          <td>Scheduled · automatic</td>
+          <td>Sensor feature PSI vs training baseline · MAE on rolling 30-day labelled subset (confirmed failures) · Precision@14d tracking</td>
+          <td>ML Engineer · automated</td>
+        </tr>
+        <tr>
+          <td>Ground truth label review</td>
+          <td><span class="gc-cadence gc-monthly">Monthly</span></td>
+          <td>Scheduled · automatic</td>
+          <td>All confirmed failure events from the past month matched against predictions. False negatives (missed failures) flagged for training set inclusion. Censored data window updated.</td>
+          <td>ML Engineer · Field Service Lead</td>
+        </tr>
+        <tr>
+          <td>ISO 13485 DHR audit</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>Scheduled · Q1/Q2/Q3/Q4</td>
+          <td>Device History Record completeness check — every work order generated by Asset IQ must have a traceable DHR event in BigQuery. Any gap is a regulatory finding.</td>
+          <td>Quality / Regulatory · QA Manager</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500" rowspan="3">Asset IQ Anomaly<br><span style="font-weight:300;font-size:10px;color:var(--text-3)">Isolation Forest</span></td>
+          <td>False positive rate</td>
+          <td><span class="gc-cadence gc-weekly">Weekly</span></td>
+          <td>Scheduled · automatic</td>
+          <td>FPR in production vs training baseline (0.04). Regional breakdown — APAC-East historically runs higher. Alert if any region exceeds 0.08.</td>
+          <td>ML Engineer · automated</td>
+        </tr>
+        <tr>
+          <td>Contamination review</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>Scheduled</td>
+          <td>Review contamination parameter (currently 0.05) against observed anomaly rate in production. If production anomaly rate diverges by &gt;2× from contamination setting, retrain with updated parameter.</td>
+          <td>ML Engineer · ML Lead</td>
+        </tr>
+        <tr>
+          <td>Regional baseline update</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>On roadmap</td>
+          <td>Deploy separate baseline models per region to address EMEA-North vs APAC-East FPR disparity. Each regional model trained on regional telemetry only.</td>
+          <td>ML Engineer · Field Service Lead</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500" rowspan="2">ContractGuard<br><span style="font-weight:300;font-size:10px;color:var(--text-3)">Clause Risk Scorer</span></td>
+          <td>Legal label refresh</td>
+          <td><span class="gc-cadence gc-monthly">Monthly</span></td>
+          <td>HITL Legal decisions (approve/revise/escalate) from the past month added to the training candidate set. Inter-annotator agreement re-computed on any new clause types. Clauses with disagreement excluded.</td>
+          <td>ML Engineer · General Counsel</td>
+        </tr>
+        <tr>
+          <td>Non-English performance</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>Scheduled</td>
+          <td>High-Risk Recall and Precision for non-English contracts (currently Precision 0.78 vs 0.82 English). Track improvement trajectory as non-English training data accumulates from HITL decisions.</td>
+          <td>ML Engineer · Legal Lead</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500" rowspan="2">FinRisk Sentinel<br><span style="font-weight:300;font-size:10px;color:var(--text-3)">Anomaly Scorer</span></td>
+          <td>Baseline update</td>
+          <td><span class="gc-cadence gc-monthly">Monthly</span></td>
+          <td>Retrain on rolling 24-month window. False positive feedback from HITL decisions incorporated via Pub/Sub baseline update queue. Per-event-type model refresh (payment, GL posting, warranty reserve).</td>
+          <td>ML Engineer · Finance Controller</td>
+        </tr>
+        <tr>
+          <td>Tier 4 FPR review</td>
+          <td><span class="gc-cadence gc-quarterly">Quarterly</span></td>
+          <td>Scheduled</td>
+          <td>Small clinic (Tier 4) FPR currently 0.08 vs overall 0.03. Track whether accumulated Tier 4 HITL decisions are improving the baseline. Separate Tier 4 model on roadmap if FPR remains &gt;0.06 after 2 quarters.</td>
+          <td>ML Engineer · Finance Controller</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── §04 ON-CALL RUNBOOK ── -->
+<section class="sec alt ap" id="runbook">
+  <div class="s-ey am">On-Call Runbook</div>
+  <h2 class="s-h2">A P0 fires at 2am. <em>Exactly what happens next.</em></h2>
+  <p class="s-p">The runbook below covers the most consequential incident type: a combined HITL framework + Audit Trail failure — the scenario where EU AI Act compliance exposure and operational failure occur simultaneously. Every step is specific, timed, and traceable. The runbook is a living artifact — updated after every incident retrospective.</p>
+
+  <div class="runbook ap">
+    <div class="rb-step">
+      <div class="rb-num">01</div>
+      <div>
+        <div class="rb-title">Page fires — acknowledge within 5 minutes</div>
+        <div class="rb-body">PagerDuty alert fires simultaneously to On-Call SRE, ML Lead, and Incident Commander (Staff Engineer or above). Acknowledge in PagerDuty within 5 minutes — this timestamps the incident start for EU AI Act compliance documentation. If acknowledgement does not occur within 5 minutes, PagerDuty escalates to the Engineering Manager automatically.</div>
+        <div class="rb-slo">SLA: 5 minutes to acknowledge · EU AI Act: incident clock starts at page time, not acknowledgement time</div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">02</div>
+      <div>
+        <div class="rb-title">Open incident record in Firestore before any remediation action</div>
+        <div class="rb-body">Before touching any infrastructure, the on-call SRE opens an incident record in the Firestore incident_records collection with: incident_id, page_timestamp, acknowledger, initial_symptoms. This is not optional — under EU AI Act Article 12, any gap in system operation that affects the audit trail must itself be documented. The incident record is the documentation of the gap. Write it first.</div>
+        <div class="rb-slo">SLA: Incident record must exist before any terraform, gcloud, or kubectl command is executed in production</div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">03</div>
+      <div>
+        <div class="rb-title">Establish blast radius — which HITL checkpoints are currently blocked?</div>
+        <div class="rb-body">Query Firestore for any HITL checkpoints in PENDING state that have not transitioned in the past 5 minutes. These are checkpoints that were triggered but the HITL framework could not present to the reviewer. Each one represents a decision that is blocked. List them: checkpoint ID, module, persona, SLA deadline. If any HITL-04 (RevRec AI) checkpoint is blocked, escalate immediately to Finance Controller — they need to know that a SAP write is pending human approval that cannot be presented to them through the system.</div>
+        <div class="rb-slo">Command: <code style="background:var(--cream-3);padding:1px 5px;font-family:var(--mono);font-size:10px">gcloud firestore query --collection hitl_events --filter "state=PENDING AND created_at&lt;[T-5min]"</code></div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">04</div>
+      <div>
+        <div class="rb-title">Check Security Command Center before touching infrastructure</div>
+        <div class="rb-body">Open SCC before any remediation. If the HITL or Audit Trail failure was triggered by a VPC-SC perimeter violation or a CMEK key issue, remediating the surface symptom without addressing the root cause will cause a second incident. SCC findings take 60 seconds to propagate after a CRITICAL event — if no CRITICAL finding is present and the incident is 5+ minutes old, the failure is likely infrastructure, not security.</div>
+        <div class="rb-slo">SLA: SCC check must complete before any Cloud Run restart or terraform apply is attempted</div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">05</div>
+      <div>
+        <div class="rb-title">Restore HITL framework — audit trail restoration runs in parallel</div>
+        <div class="rb-body">Two tracks run simultaneously. Track A: On-Call SRE restores the HITL Cloud Run service (check Cloud Run revision health, check Firestore connectivity, check Secret Manager token validity). Track B: Second responder verifies Firestore audit write path — run a synthetic audit record write to the hitl_events collection and confirm it commits within 2s. If either track fails, escalate to the Principal Engineer on the engineering escalation path immediately.</div>
+        <div class="rb-slo">Target: HITL framework restored within 15 minutes of incident start. Audit trail restored within 10 minutes (tighter — every minute of gap is a compliance exposure).</div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">06</div>
+      <div>
+        <div class="rb-title">Replay any blocked HITL checkpoints</div>
+        <div class="rb-body">Once the HITL framework is confirmed healthy, replay each blocked checkpoint identified in Step 03. The Orchestrator's replay function re-presents the checkpoint to the appropriate reviewer with a note that the presentation was delayed due to a system incident. The delay timestamp and incident ID are written to the HITL event record as an immutable annotation — the reviewer sees the original decision context plus the incident note. EU AI Act auditors reviewing the record will see a delay, not a gap.</div>
+        <div class="rb-slo">All blocked checkpoints must be replayed within 30 minutes of HITL framework restoration. Each replay is logged to the incident record.</div>
+      </div>
+    </div>
+    <div class="rb-step">
+      <div class="rb-num">07</div>
+      <div>
+        <div class="rb-title">Declare incident resolved and trigger retrospective</div>
+        <div class="rb-body">Incident is resolved when: HITL framework is healthy (synthetic checkpoint creates successfully), Audit Trail write SLO is green (verified by Cloud Monitoring), all blocked checkpoints have been replayed, and the incident record in Firestore is updated with: resolution_timestamp, root_cause_category, immediate_remediation_actions. The retrospective ticket must be created within 24 hours of resolution — not after the next sprint planning. It must include: timeline, blast radius (which HITL checkpoints were blocked, which modules were affected), root cause, and the specific architecture change or runbook update that prevents recurrence.</div>
+        <div class="rb-slo">Retrospective ticket: within 24 hours of resolution. Architecture change PR (if required): within 1 sprint.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §05 CHAOS ENGINEERING CADENCE ── -->
+<section class="sec dk ap" id="chaos">
+  <div class="s-ey" style="color:var(--gold-lt)">Chaos Engineering Cadence</div>
+  <h2 class="s-h2">Suite-level failure drills. <em>Quarterly. Mandatory.</em></h2>
+  <p class="s-p">Page 07 defined six infrastructure-level chaos experiments. These six extend that programme to the suite level — testing cross-module failure propagation, the HITL framework under load, and model governance under adversarial conditions. Every experiment has a specific expected outcome. If the outcome does not match, the architecture has a gap.</p>
+
+  <div class="chaos-grid ap">
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 01</div>
+      <div class="cc-cadence">Quarterly · Month 1</div>
+      <div class="cc-title">HITL framework failure under full suite load</div>
+      <div class="cc-scenario">Simulate HITL framework unavailability for 8 minutes during a period when all four HITL-generating modules (RevRec AI, ContractGuard, Asset IQ, FinRisk Sentinel) have active checkpoints in-flight simultaneously.</div>
+      <div class="cc-expect"><strong>Expected:</strong> All four modules enter CIRCUIT OPEN state independently. Each module's circuit breaker routes its pending decision to a manual fallback — Finance Controller, Legal, FSM, and CFO each receive a manual review notification with the context package the agent had assembled. No module waits for another. HITL event records for blocked checkpoints show the incident annotation after replay. Cross-module burn rate remains within P1 threshold (not P0) because each module degrades independently.</div>
+    </div>
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 02</div>
+      <div class="cc-cadence">Quarterly · Month 1</div>
+      <div class="cc-title">Model drift injection — RevRec AI and ContractGuard simultaneously</div>
+      <div class="cc-scenario">Inject synthetic feature distribution shift simultaneously into the contract_value_eur feature (RevRec AI) and the governing_law_match feature (ContractGuard). Both should trigger PSI &gt; 0.2 alert within the weekly drift detection window.</div>
+      <div class="cc-expect"><strong>Expected:</strong> Vertex AI Monitoring fires two separate drift alerts within 7 days of injection. Each routes independently to HITL-10 retraining checkpoint. The HITL-10 queue shows both alerts simultaneously — ML Engineer receives them as separate items with separate evidence packages. Critically: RevRec AI and ContractGuard continue operating in production during the drift alert period — drift does not trigger automatic shutdown, only a retraining recommendation.</div>
+    </div>
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 03</div>
+      <div class="cc-cadence">Quarterly · Month 2</div>
+      <div class="cc-title">Data Governance quarantine cascade</div>
+      <div class="cc-scenario">Introduce a schema version mismatch in the APAC-East asset telemetry pipeline that affects 15% of daily records. Verify that Data Governance correctly quarantines the affected records, that Asset IQ inference excludes them, and that the quarantine does not propagate to ContractGuard or RevRec AI feature groups.</div>
+      <div class="cc-expect"><strong>Expected:</strong> Data Governance quarantines affected records within one ingestion cycle. Asset IQ runs on the 85% of clean records — prediction quality is lower but inference continues. Strategy Dashboard shows Asset IQ data quality indicator as degraded. ContractGuard and RevRec AI feature stores are unaffected — they use independent feature groups. Data steward receives a P2 alert, not a P0. Quarantine is lifted only after data steward approves the corrected records.</div>
+    </div>
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 04</div>
+      <div class="cc-cadence">Quarterly · Month 2</div>
+      <div class="cc-title">HITL SLA breach cascade across all modules</div>
+      <div class="cc-scenario">Simulate all Finance Controller HITL checkpoints (HITL-04 for RevRec AI) timing out simultaneously — the Finance Controller is unreachable for 4 hours and 5 minutes, triggering the SLA breach escalation path.</div>
+      <div class="cc-expect"><strong>Expected:</strong> Cloud Scheduler timeout job fires at t+4h for each blocked HITL-04. Each escalates to CFO automatically with the original classification, SHAP explanation, and SLA breach note. No SAP writes occur during the breach period — the write guard holds regardless of SLA status. The HITL event records for each breached checkpoint show the escalation as an immutable annotation. EU AI Act compliance record shows SLA breaches documented, not hidden. The Strategy Dashboard HITL panel shows elevated breach count — CTO can see the operational state in real time.</div>
+    </div>
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 05</div>
+      <div class="cc-cadence">Quarterly · Month 3</div>
+      <div class="cc-title">SHAP faithfulness gate failure in production pipeline</div>
+      <div class="cc-scenario">Inject a synthetic model version into the RevRec AI Vertex AI Pipeline where the SHAP perturbation test returns faithfulness of 87% — below the 90% threshold that gates HITL-11 promotion.</div>
+      <div class="cc-expect"><strong>Expected:</strong> Pipeline fails at the XAI Gate step. Model does not proceed to HITL-11 regardless of its evaluation metrics. ML Engineer receives a pipeline failure notification with the specific faithfulness test result and the examples where perturbation did not produce the expected direction change. Previous production model remains in service. Incident is logged as a pipeline failure, not an operational incident — the gate worked correctly. Retrospective reviews whether the faithfulness failure was due to a model architecture change or a data quality issue.</div>
+    </div>
+    <div class="chaos-card">
+      <div class="cc-label">Suite Experiment 06</div>
+      <div class="cc-cadence">Quarterly · Month 3</div>
+      <div class="cc-title">Full suite rebuild from Terraform state — suite-level verification</div>
+      <div class="cc-scenario">Extend the page-07 infrastructure rebuild experiment to the full AS Suite: after rebuilding the GCP infrastructure from Terraform state, verify that all eight module pages are reachable, that the HITL framework creates and presents a synthetic checkpoint, that Vertex AI Feature Store serves the expected features, and that the Strategy Dashboard renders all four panels with live data within 10 minutes of infrastructure restore.</div>
+      <div class="cc-expect"><strong>Expected:</strong> Full infrastructure rebuild in under 45 minutes (page-07 target). Suite-level verification adds 10 minutes. Total time from terraform apply completion to full suite operational: under 55 minutes. This experiment validates that the AS is not just infrastructure-as-code but suite-as-code — the complete operational state is reproducible from the repository and the Terraform state file alone.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §06 ADR-017 ── -->
+<section class="sec ap" id="adr">
+  <div class="s-ey te">Architecture Decision Record</div>
+  <h2 class="s-h2">One operational decision worth <em>documenting.</em></h2>
+  <p class="s-p">ADR-017 covers the most consequential Day 2 design decision: how HITL SLA breaches are handled at the suite level when the Finance Controller is the single point of approval for all RevRec AI classifications.</p>
+
+  <div class="adr-single ap">
+    <div class="adr-id">ADR-017 · Day 2 Operations</div>
+    <div class="adr-title">Automatic CFO escalation on HITL-04 SLA breach — not manual triage</div>
+
+    <div class="adr-section">Decision</div>
+    <div class="adr-text">When a HITL-04 (RevRec AI Finance Controller review) checkpoint exceeds its 4-hour SLA, escalation to the CFO is triggered automatically by Cloud Scheduler — not by a human triage decision. The CFO receives the original classification, SHAP explanation, comparable transactions, and a note that the Finance Controller SLA was exceeded. The SLA breach is documented as an immutable annotation in the HITL event record. SAP write remains blocked throughout — the breach does not bypass the approval requirement.</div>
+
+    <div class="adr-section">Alternatives Rejected</div>
+    <div class="adr-rejected">Manual triage on SLA breach: requires a human to notice the breach, assess its severity, decide who to escalate to, and initiate the escalation. In a 24-hour operation with a Finance Controller who may be in a different timezone, a manual triage step adds unpredictable latency and introduces a human failure point in a compliance-critical path. The EU AI Act does not accept "the escalation was delayed because no one noticed the SLA breach" as a valid explanation for a gap in the oversight record. Auto-escalation is structurally superior because it is deterministic. Allow timeout to auto-approve: categorically rejected. The SAP write guard is architecturally enforced — no approval record, no write, regardless of SLA status. Timeout-based auto-approval would require removing the mandatory HITL record ID parameter from the SAP write call, which would violate the core architectural constraint established in ADR-003.</div>
+
+    <div class="adr-section">Consequences</div>
+    <div class="adr-text">The CFO receives HITL-04 escalations whenever the Finance Controller is unavailable or unresponsive. This is an intentional design choice: the CFO is the appropriate escalation authority for revenue recognition decisions, and their receiving a HITL queue item is not an exceptional event — it is the designed fallback. The consequence of this design is that the CFO must be trained on the HITL-04 review UI and understand the SHAP explanation format before the AS goes live. This training requirement is a H2 go-live prerequisite, not an operational afterthought. The 24-hour retrospective requirement after any SLA breach ensures that repeated breaches are diagnosed and addressed — whether the root cause is Finance Controller availability, HITL UI usability, or model confidence distribution.</div>
+
+    <div class="adr-status">Accepted · Day 2 Operations</div>
+  </div>
+</section>
+
+<!-- ── BRIDGE ── -->
+<div class="bridge ap">
+  <div>
+    <div class="br-label">Portfolio Complete</div>
+    <div class="br-h">Ten pages.<br><strong>One complete system.</strong></div>
+    <p class="br-p">Pages 01–10 constitute a complete enterprise architecture portfolio covering TOGAF Phases A through H: strategy, stakeholder analysis, architecture development, delivery planning, agent and ML design, infrastructure, adoption, suite index, and operational governance. Every decision is documented. Every claim traces to an artifact.</p>
+  </div>
+  <div class="pages">
+    <a href="page-09.html" class="pg-link">
+      <div class="pl-n">PG 09</div>
+      <div><div class="pl-title">← AS Suite Module Index</div><div class="pl-sub">Eight modules · demo pathways · dependencies</div></div>
+      <div class="pl-arr">→</div>
+    </a>
+    <a href="index.html" class="pg-link">
+      <div class="pl-n">INDEX</div>
+      <div><div class="pl-title">← Portfolio Overview</div><div class="pl-sub">Return to the full portfolio index</div></div>
+      <div class="pl-arr">→</div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-brand">The <em>Autonomous</em> Seller</div>
+  <div class="ft-copy">© 2026 Siddharth Rao</div>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function t(){c.style.left=mx+'px';c.style.top=my+'px';rx+=(mx-rx)*.1;ry+=(my-ry)*.1;r.style.left=rx+'px';r.style.top=ry+'px';requestAnimationFrame(t)})();
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in')}),{threshold:.04});
+document.querySelectorAll('.ap').forEach(el=>io.observe(el));
+const secs=['slos','alerts','governance','runbook','chaos','adr'];
+const sio=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.sn').forEach(l=>l.classList.remove('act'));
+      const link=document.querySelector(`.sn[data-sec="${e.target.id}"]`);
+      if(link)link.classList.add('act');
+    }
+  });
+},{threshold:.15,rootMargin:'-80px 0px -60% 0px'});
+secs.forEach(id=>{const el=document.getElementById(id);if(el)sio.observe(el)});
+</script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adoption Architecture — Page 08 · The Autonomous Seller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --ink:#0E0D0B;--ink-2:#1A1916;--ink-3:#252420;
+  --cream:#F5F0E8;--cream-2:#EDE8DC;--cream-3:#E3DDD0;
+  --gold:#B8960C;--gold-lt:#D4AC1A;--gold-dim:rgba(184,150,12,0.14);
+  --rule:rgba(14,13,11,0.10);--rule-lt:rgba(14,13,11,0.05);
+  --white:#FDFAF4;
+  --text:#1A1916;--text-2:#4A4840;--text-3:#7A7668;
+  --mono:'IBM Plex Mono',monospace;--display:'Syne',sans-serif;--serif:'Cormorant Garamond',Georgia,serif;
+  --blue:#1557B0;--blue-lt:#E8F0FE;--blue-dk:#0D3D80;
+  --green:#0D5226;--green-lt:#E6F4EA;--green-dk:#083D1A;
+  --amber:#7A4100;--amber-lt:#FEF3E2;--amber-dk:#4D2800;
+  --red:#A50E0E;--red-lt:#FCE8E6;--red-dk:#7A0A0A;
+  --teal:#005F67;--teal-lt:#E4F7F7;
+  --purple:#3700B3;--purple-lt:#EDE7F6;
+  --col:56px;
+}
+body{font-family:var(--display);background:var(--cream);color:var(--text);overflow-x:hidden;cursor:none}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E")}
+#cur{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .15s,height .15s}
+#cur-r{position:fixed;top:0;left:0;width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.35;transition:width .25s,height .25s}
+body:has(a:hover) #cur{width:13px;height:13px}
+body:has(a:hover) #cur-r{width:44px;height:44px;opacity:.18}
+
+/* ── NAV ── */
+.mnav{position:fixed;top:0;left:0;right:0;z-index:600;display:flex;align-items:center;justify-content:space-between;padding:15px var(--col);background:rgba(245,240,232,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule)}
+.mn-l{display:flex;align-items:center;gap:14px}
+.mn-back{font-family:var(--mono);font-size:11px;color:var(--text-2);text-decoration:none;letter-spacing:.05em;transition:color .2s}.mn-back:hover{color:var(--gold)}
+.mn-sep{width:1px;height:14px;background:var(--rule)}
+.mn-crumb{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.04em}.mn-crumb strong{color:var(--text);font-weight:500}
+.mn-r{display:flex;align-items:center;gap:20px}
+.mn-link{font-family:var(--mono);font-size:11px;color:var(--text-2);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}.mn-link:hover{color:var(--gold)}
+.mn-gh{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--cream);background:var(--ink);text-decoration:none;padding:7px 16px;letter-spacing:.06em;text-transform:uppercase;transition:background .2s}.mn-gh:hover{background:var(--gold)}
+
+/* ── SECTION NAV ── */
+.snav{position:sticky;top:52px;z-index:500;background:rgba(245,240,232,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);padding:0 var(--col);display:flex;overflow-x:auto;scrollbar-width:none}
+.snav::-webkit-scrollbar{display:none}
+.sn{font-family:var(--mono);font-size:11px;color:var(--text-3);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;padding:11px 18px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .18s,border-color .18s}
+.sn:hover{color:var(--gold)}.sn.act{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
+
+/* ── PAGE HEADER ── */
+.phdr{background:var(--ink);padding:80px var(--col) 60px;margin-top:88px;position:relative;overflow:hidden}
+.phdr::before{content:'08';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-family:var(--display);font-size:220px;font-weight:800;color:rgba(255,255,255,.025);letter-spacing:-.05em;line-height:1;pointer-events:none;user-select:none}
+.ph-bc{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ph-bc span{color:rgba(245,240,232,.18)}
+.ph-h1{font-family:var(--serif);font-size:clamp(32px,4.8vw,58px);font-weight:300;color:var(--cream);line-height:1.05;margin-bottom:14px}
+.ph-h1 strong{font-weight:600}.ph-h1 em{font-style:italic;color:var(--gold)}
+.ph-sub{font-family:var(--mono);font-size:13px;font-weight:300;color:rgba(245,240,232,.48);line-height:1.75;max-width:640px}
+.ph-tags{display:flex;gap:8px;margin-top:28px;flex-wrap:wrap}
+.ph-tag{font-family:var(--mono);font-size:10px;padding:4px 11px;border:1px solid rgba(255,255,255,.14);color:rgba(245,240,232,.65);letter-spacing:.06em}
+
+/* ── SECTIONS ── */
+.sec{padding:64px var(--col);background:var(--cream)}
+.sec.alt{background:var(--cream-2)}
+.sec.dk{background:var(--ink);padding:64px var(--col)}
+.s-ey{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.s-ey::before{content:'';display:block;width:18px;height:1px;background:currentColor}
+.s-ey.gr{color:var(--green)}.s-ey.am{color:var(--amber)}.s-ey.re{color:var(--red)}.s-ey.pu{color:var(--purple)}.s-ey.te{color:var(--teal)}
+.sec.dk .s-ey{color:var(--gold-lt)}
+.s-h2{font-family:var(--serif);font-size:clamp(26px,3.2vw,40px);font-weight:300;color:var(--ink);line-height:1.1;margin-bottom:10px}
+.s-h2 strong{font-weight:600}.s-h2 em{font-style:italic;color:var(--gold)}
+.sec.dk .s-h2{color:var(--cream)}
+.s-p{font-family:var(--mono);font-size:13px;font-weight:300;color:var(--text-2);line-height:1.85;max-width:680px;margin-bottom:0}
+.sec.dk .s-p{color:rgba(245,240,232,.5)}
+.ap{opacity:0;transform:translateY(14px);transition:opacity .65s ease,transform .65s ease}
+.ap.in{opacity:1;transform:none}
+
+/* ── ARGUMENT FRAME ── */
+.frame{background:var(--ink);padding:36px 40px;margin-top:36px;position:relative;overflow:hidden}
+.frame::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold)}
+.frame-text{font-family:var(--serif);font-size:clamp(18px,2.2vw,26px);font-weight:300;font-style:italic;color:var(--cream);line-height:1.6;max-width:760px}
+.frame-text strong{font-style:normal;font-weight:600;color:var(--gold-lt)}
+.frame-attr{font-family:var(--mono);font-size:11px;color:rgba(245,240,232,.35);margin-top:16px;letter-spacing:.06em}
+
+/* ── ARGUMENT CARDS ── */
+.arg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.arg-card{background:var(--cream-2);border:1px solid var(--rule);border-top:3px solid var(--rule);padding:22px;transition:border-top-color .2s,background .2s}
+.arg-card:hover{background:var(--white);border-top-color:var(--gold)}
+.arg-card.c-blue{border-top-color:var(--blue)}.arg-card.c-blue:hover{border-top-color:var(--gold)}
+.arg-card.c-green{border-top-color:var(--green)}.arg-card.c-green:hover{border-top-color:var(--gold)}
+.arg-card.c-amber{border-top-color:var(--amber)}.arg-card.c-amber:hover{border-top-color:var(--gold)}
+.arg-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.arg-card.c-blue .arg-label{color:var(--blue)}
+.arg-card.c-green .arg-label{color:var(--green)}
+.arg-card.c-amber .arg-label{color:var(--amber)}
+.arg-title{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.2;letter-spacing:-.01em}
+.arg-body{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.75}
+
+/* ── BUYER MAP TABLE ── */
+table.bm{width:100%;border-collapse:collapse;margin-top:4px}
+table.bm th{background:var(--ink);color:rgba(245,240,232,.45);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:11px 16px;text-align:left;border-right:1px solid rgba(255,255,255,.06)}
+table.bm th:last-child{border-right:none}
+table.bm td{padding:14px 16px;font-family:var(--mono);font-size:11px;color:var(--text);border-bottom:1px solid var(--rule-lt);border-right:1px solid var(--rule-lt);vertical-align:top;line-height:1.6;font-weight:300}
+table.bm td:last-child{border-right:none}
+table.bm tr:last-child td{border-bottom:none}
+table.bm tr:hover td{background:var(--cream-2)}
+.bm-persona{font-weight:500;color:var(--ink);display:block;margin-bottom:2px}
+.bm-role{font-size:10px;color:var(--text-3)}
+.hz-pill{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;letter-spacing:.06em}
+.hp1{background:var(--blue-lt);color:var(--blue-dk)}
+.hp2{background:var(--green-lt);color:var(--green-dk)}
+.hp3{background:var(--amber-lt);color:var(--amber-dk)}
+.pg-ref{font-family:var(--mono);font-size:10px;color:var(--gold);display:inline-flex;align-items:center;gap:3px;margin-top:4px}
+.pg-ref::before{content:'→ '}
+
+/* ── HORIZON CARDS ── */
+.hz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.hz-card{border:1px solid var(--rule);padding:28px 26px}
+.hz-card.h1{background:var(--blue-lt);border-color:rgba(21,87,176,.15)}
+.hz-card.h2{background:var(--green-lt);border-color:rgba(13,82,38,.15)}
+.hz-card.h3{background:var(--amber-lt);border-color:rgba(122,65,0,.15)}
+.hzc-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.hz-card.h1 .hzc-label{color:var(--blue-dk)}
+.hz-card.h2 .hzc-label{color:var(--green-dk)}
+.hz-card.h3 .hzc-label{color:var(--amber-dk)}
+.hzc-period{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.hz-card.h1 .hzc-period{color:var(--blue)}
+.hz-card.h2 .hzc-period{color:var(--green)}
+.hz-card.h3 .hzc-period{color:var(--amber)}
+.hzc-name{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:14px}
+.hz-card.h1 .hzc-name{color:var(--blue-dk)}
+.hz-card.h2 .hzc-name{color:var(--green-dk)}
+.hz-card.h3 .hzc-name{color:var(--amber-dk)}
+.hzc-delivered{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.hz-card.h1 .hzc-delivered{color:var(--blue-dk)}
+.hz-card.h2 .hzc-delivered{color:var(--green-dk)}
+.hz-card.h3 .hzc-delivered{color:var(--amber-dk)}
+.hzc-items{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.hzc-item{font-family:var(--mono);font-size:11px;font-weight:300;line-height:1.5;display:flex;align-items:flex-start;gap:7px}
+.hz-card.h1 .hzc-item{color:var(--blue-dk)}
+.hz-card.h2 .hzc-item{color:var(--green-dk)}
+.hz-card.h3 .hzc-item{color:var(--amber-dk)}
+.hzc-item::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.hz-card.h1 .hzc-item::before{background:var(--blue)}
+.hz-card.h2 .hzc-item::before{background:var(--green)}
+.hz-card.h3 .hzc-item::before{background:var(--amber)}
+.hzc-feels{border-top:1px solid rgba(0,0,0,.08);padding-top:12px;font-family:var(--mono);font-size:10px;line-height:1.6}
+.hz-card.h1 .hzc-feels{color:var(--blue-dk)}
+.hz-card.h2 .hzc-feels{color:var(--green-dk)}
+.hz-card.h3 .hzc-feels{color:var(--amber-dk)}
+.hzc-feels strong{font-weight:500;display:block;margin-bottom:3px}
+.hzc-gate{margin-top:10px;padding:8px 10px;font-family:var(--mono);font-size:10px;line-height:1.5}
+.hz-card.h1 .hzc-gate{background:rgba(21,87,176,.1);color:var(--blue-dk)}
+.hz-card.h2 .hzc-gate{background:rgba(13,82,38,.1);color:var(--green-dk)}
+.hz-card.h3 .hzc-gate{background:rgba(122,65,0,.1);color:var(--amber-dk)}
+.hzc-gate strong{font-weight:500}
+
+/* ── RISK CARDS ── */
+.risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:4px}
+.risk-card{background:var(--cream-2);border:1px solid var(--rule);padding:24px;transition:background .2s}
+.risk-card:hover{background:var(--white)}
+.rc-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;color:var(--red)}
+.rc-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.01em;line-height:1.2}
+.rc-risk{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.75;margin-bottom:12px;padding-left:12px;border-left:2px solid var(--red-lt)}
+.rc-mit-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--green);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.rc-mit{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.75;padding-left:12px;border-left:2px solid var(--green-lt)}
+.rc-arch-ref{font-family:var(--mono);font-size:10px;color:var(--gold);margin-top:8px;display:flex;align-items:center;gap:4px}
+.rc-arch-ref::before{content:'→'}
+
+/* ── ADR — three-section format ── */
+.adr-single{background:var(--cream-2);border:1px solid var(--rule);border-left:4px solid var(--blue);padding:28px;margin-top:4px}
+.adr-id{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.adr-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:20px;letter-spacing:-.01em;line-height:1.2}
+.adr-section{font-family:var(--mono);font-size:9px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:14px;margin-bottom:5px}
+.adr-text{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.7}
+.adr-rejected{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--red-dk);line-height:1.7}
+.adr-consequences{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--text-2);line-height:1.7;padding:12px 16px;background:var(--cream-3);border:1px solid var(--rule-lt);margin-top:4px}
+.adr-status{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;background:var(--green-lt);color:var(--green-dk);letter-spacing:.06em;margin-top:14px}
+
+/* ── BRIDGE / FOOTER ── */
+.bridge{padding:64px var(--col);background:var(--ink);display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.br-label{font-family:var(--mono);font-size:10px;color:var(--gold-lt);letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.br-label::before{content:'';display:block;width:18px;height:1px;background:var(--gold-lt)}
+.br-h{font-family:var(--serif);font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--cream);line-height:1.15;margin-bottom:16px}
+.br-h strong{font-weight:600}
+.br-p{font-family:var(--mono);font-size:12px;font-weight:300;color:rgba(245,240,232,.48);line-height:1.85}
+.pages{display:flex;flex-direction:column;gap:3px}
+.pg-link{display:grid;grid-template-columns:52px 1fr 20px;align-items:center;gap:12px;padding:16px 20px;background:var(--ink-2);text-decoration:none;border:1px solid transparent;transition:background .18s,border-color .18s,transform .18s}
+.pg-link:hover{background:var(--ink-3);border-color:rgba(255,255,255,.08);transform:translateX(4px)}
+.pl-n{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.07em}
+.pl-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--cream);letter-spacing:-.01em}
+.pl-sub{font-family:var(--mono);font-size:10px;font-weight:300;color:rgba(245,240,232,.35);margin-top:2px}
+.pl-arr{font-family:var(--mono);font-size:13px;color:rgba(245,240,232,.3);transition:color .18s,transform .18s}
+.pg-link:hover .pl-arr{color:var(--gold);transform:translateX(3px)}
+footer{background:var(--ink-2);padding:28px var(--col);border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ft-brand{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--cream)}
+.ft-brand em{font-style:italic;color:var(--gold)}
+.ft-copy{font-family:var(--mono);font-size:11px;color:rgba(245,240,232,.2);letter-spacing:.03em}
+
+@media(max-width:1100px){:root{--col:32px}}
+@media(max-width:860px){
+  :root{--col:22px}
+  .arg-grid{grid-template-columns:1fr}
+  .hz-grid{grid-template-columns:1fr}
+  .risk-grid{grid-template-columns:1fr}
+  .bridge{grid-template-columns:1fr}
+  .mn-r .mn-link{display:none}
+}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- ── MAIN NAV ── -->
+<nav class="mnav">
+  <div class="mn-l">
+    <a href="page-07.html" class="mn-back">← Page 07</a>
+    <div class="mn-sep"></div>
+    <div class="mn-crumb">The Autonomous Seller &nbsp;/&nbsp; <strong>Page 08 — Adoption Architecture</strong></div>
+  </div>
+  <div class="mn-r">
+    <a href="index.html" class="mn-link">Overview</a>
+    <a href="page-07.html" class="mn-link">← Page 07</a>
+    <a href="https://github.com/raosiddharthp/The-Autonomous-Enterprise" target="_blank" class="mn-gh">GitHub →</a>
+  </div>
+</nav>
+
+<!-- ── SECTION NAV ── -->
+<nav class="snav" id="snav">
+  <a href="#argument" class="sn act" data-sec="argument">Adoption Rationale</a>
+  <a href="#buyer-map" class="sn" data-sec="buyer-map">Stakeholder Map</a>
+  <a href="#horizons" class="sn" data-sec="horizons">Value by Horizon</a>
+  <a href="#risks" class="sn" data-sec="risks">Adoption Risks</a>
+  <a href="#adr" class="sn" data-sec="adr">ADR</a>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<header class="phdr">
+  <div class="ph-bc">The Autonomous Seller <span>/</span> Page 08</div>
+  <h1 class="ph-h1">Adoption<br><em>Architecture</em><br><strong>— TOGAF Phase F &amp; G.</strong></h1>
+  <p class="ph-sub">The architecture is complete across Pages 01–07. This page closes the TOGAF sequence: Phase F (Migration Planning) and Phase G (Implementation Governance) expressed as adoption argument, stakeholder map, phased delivery rationale, organisational risk mitigations, and ADR-016. Every claim traces back to an artifact already designed on a prior page.</p>
+  <div class="ph-tags">
+    <span class="ph-tag">TOGAF Phase F · Phase G</span>
+    <span class="ph-tag">5 Stakeholder Personas</span>
+    <span class="ph-tag">3 Delivery Horizons</span>
+    <span class="ph-tag">4 Adoption Risks</span>
+    <span class="ph-tag">ADR-016</span>
+  </div>
+</header>
+
+<!-- ── §01 ADOPTION RATIONALE ── -->
+<section class="sec ap" id="argument">
+  <div class="s-ey">Adoption Rationale</div>
+  <h2 class="s-h2">Enterprise AI fails at the <em>organisational boundary</em> — not the technical one.</h2>
+  <p class="s-p">The architecture on Pages 01–07 is sound. The more important question is whether ClaraVis can actually adopt it — across nine stakeholders, three regulatory obligations, two legacy systems, and a Finance team that has been doing manual ASC 606 classification for fifteen years. The AS is designed to answer that question architecturally. S-01 (CTO) and S-09 (CISO) are structural stakeholders: their adoption requirements — architecture coherence, security posture, data sovereignty — are satisfied through the design itself on Pages 03, 06, and 07, not through user-facing module features.</p>
+
+  <div class="frame ap">
+    <div class="frame-text">Enterprise AI adoption fails when it asks too much of the organisation at once — when the compliance posture, the change management load, and the integration complexity all land simultaneously. The AS avoids this by design: <strong>each horizon delivers standalone value before the next begins.</strong> ClaraVis does not need to commit to all eight modules. It needs to commit to three — and see the results — before the next three become an easy decision rather than a leap of faith.</div>
+    <div class="frame-attr">Derived from: TOGAF Phase F Migration Horizons (Page 03) · SAFe Solution Train PI cadence (Page 04) · Requirements C-05 (Page 02)</div>
+  </div>
+
+  <div class="arg-grid ap">
+    <div class="arg-card c-blue">
+      <div class="arg-label">Why phased adoption works here</div>
+      <div class="arg-title">The EU AI Act deadline is a forcing function</div>
+      <div class="arg-body">ClaraVis has three production ML models with no EU AI Act compliance posture and a regulatory review in Q2 2026. Horizon 1 — the HITL framework, XAI layer, and Model Cards for those three models — delivers compliance before the review. That single outcome justifies the entire Horizon 1 investment without any discussion of the broader AS vision. Horizons 2 and 3 follow because Horizon 1 built the platform they run on.</div>
+    </div>
+    <div class="arg-card c-green">
+      <div class="arg-label">Why it doesn't disrupt existing systems</div>
+      <div class="arg-title">Salesforce and SAP stay exactly where they are</div>
+      <div class="arg-body">ADR-002 (Page 03) is the adoption argument in architectural form: the AS augments existing systems — it never replaces them. Salesforce remains the system of record. SAP remains the ERP. The AS is the orchestration and intelligence layer that sits above them. ClaraVis's existing Salesforce and SAP implementations are not touched, re-platformed, or migrated. The adoption risk that kills most enterprise AI programmes — the system migration — does not exist here.</div>
+    </div>
+    <div class="arg-card c-amber">
+      <div class="arg-label">Why trust is built in</div>
+      <div class="arg-title">Every consequential decision has a human in the loop</div>
+      <div class="arg-body">The eleven HITL checkpoints on Page 04 are not a compliance feature — they are an adoption feature. The Finance Controller who has been classifying ASC 606 transactions manually for fifteen years will not trust an ML model on day one. The HITL framework gives them the control to verify the model's reasoning before it posts to SAP. Trust is earned checkpoint by checkpoint, tracked via HITL override rate in Vertex AI Monitoring. The architecture is designed for that journey, not the destination.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §02 STAKEHOLDER MAP ── -->
+<section class="sec alt ap" id="buyer-map">
+  <div class="s-ey">Stakeholder Map</div>
+  <h2 class="s-h2">Five personas. One table. <em>Every column already designed.</em></h2>
+  <p class="s-p">A synthesis view connecting the stakeholder register on Page 02, the persona cards on Page 04, and the migration horizons from Page 03. Every stakeholder has a specific pain addressed by a specific module delivered in a specific horizon — with a measurable outcome that maps to the acceptance criteria established in Phase B.</p>
+
+  <table class="bm ap">
+    <thead><tr>
+      <th style="width:160px">Persona</th>
+      <th style="width:190px">Primary pain (Page 02)</th>
+      <th>AS module that addresses it</th>
+      <th style="width:80px">Horizon</th>
+      <th style="width:200px">Measurable outcome</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>
+          <span class="bm-persona">The Compliance Officer</span>
+          <span class="bm-role">CCO · S-02</span>
+          <span class="pg-ref">Page 04 · Persona 02</span>
+        </td>
+        <td>3 production ML models with no EU AI Act compliance posture. Q2 2026 regulatory review approaching with no audit trail.</td>
+        <td>HITL Framework · XAI Layer · Model Cards for 3 existing models. SHAP explanation per inference, HITL-04/06/08 checkpoints, immutable Firestore audit trail queryable on demand.</td>
+        <td><span class="hz-pill hp1">H1</span></td>
+        <td>Audit trail query returns in &lt;30s. HITL records cover 100% of model inferences from H1 go-live. Model Cards complete for all 3 models before Q2 2026 review.</td>
+      </tr>
+      <tr>
+        <td>
+          <span class="bm-persona">The Enterprise Architect</span>
+          <span class="bm-role">EA · S-08</span>
+          <span class="pg-ref">Page 04 · Persona 01</span>
+        </td>
+        <td>Architecture decisions made informally. No ADR index. Infrastructure state partially manual. Integration failures discovered at system test.</td>
+        <td>Terraform IaC · ADR Index · Architecture Explorer. Every resource in code. Every decision documented. Full environment reproducible from state file in &lt;45 minutes.</td>
+        <td><span class="hz-pill hp1">H1</span></td>
+        <td>terraform plan produces complete infrastructure diff before any change reaches production. ADR-001 through ADR-016 queryable in architecture review. Zero console-provisioned resources in production.</td>
+      </tr>
+      <tr>
+        <td>
+          <span class="bm-persona">The Finance Controller</span>
+          <span class="bm-role">Head of Revenue Acctg · S-03</span>
+          <span class="pg-ref">Page 04 · Persona 03</span>
+        </td>
+        <td>Manual ASC 606 classification. 12-day month-end close. Revenue restatements at quarter-end averaging €18K per misclassification.</td>
+        <td>RevRec AI · Finance HITL (HITL-04/05) · SAP integration. ML classifies every transaction with SHAP explanation and comparable transactions. Finance Controller approves before SAP posts — no exceptions.</td>
+        <td><span class="hz-pill hp2">H2</span></td>
+        <td>Month-end close reduces from 12 days to ≤9 days (BR-01 acceptance criterion). HITL override rate &lt;15% by month 3 of H2 — the primary trust-building metric. Zero SAP posts without a committed HITL approval record.</td>
+      </tr>
+      <tr>
+        <td>
+          <span class="bm-persona">The Field Service Manager</span>
+          <span class="bm-role">Regional FSM · S-06</span>
+          <span class="pg-ref">Page 04 · Persona 05</span>
+        </td>
+        <td>Reactive maintenance. 6 disconnected regional asset systems. No cross-regional pattern visibility. €40M warranty over-reserve driven by unplanned failures.</td>
+        <td>Asset IQ · Unified telemetry pipeline · Fleet anomaly detection (HITL-06/07). RUL predictions with SHAP sensor attribution. Cross-regional fleet anomaly alerts with 72+ hour lead time.</td>
+        <td><span class="hz-pill hp2">H2</span></td>
+        <td>≥72 hour advance notice on predicted failures (BR-04 acceptance criterion). Unplanned field service events reduce by ≥30% within 6 months of H2 go-live. Fleet anomaly patterns surfaced across all 6 regional systems in a single HITL-07 alert.</td>
+      </tr>
+      <tr>
+        <td>
+          <span class="bm-persona">The Account Executive</span>
+          <span class="bm-role">Senior AE · S-04</span>
+          <span class="pg-ref">Page 04 · Persona 04</span>
+        </td>
+        <td>3–5 day time-to-qualified-AE. Manual qualification and configuration consuming AE time that should be spent on commercial terms and relationship.</td>
+        <td>CCAI Sales Agent · Salesforce integration · ContractGuard. Agent handles first 11 qualification turns. Validated config, BOM, and briefing doc complete before AE engages.</td>
+        <td><span class="hz-pill hp3">H3</span></td>
+        <td>Time-to-qualified-AE reduces from 3–5 days to ≤1 day (BR-02 acceptance criterion). AE enters every conversation with Opportunity created, BOM validated, and briefing doc generated — measured via Salesforce Activity log per Opportunity.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── §03 VALUE BY HORIZON ── -->
+<section class="sec ap" id="horizons">
+  <div class="s-ey gr">Value by Horizon</div>
+  <h2 class="s-h2">Each horizon delivers <em>before</em> the next begins.</h2>
+  <p class="s-p">The three horizons from TOGAF Phase F (Page 03) restated through an adoption lens. Each card answers: what is delivered, who feels it first, the architectural dependency that makes this sequencing non-negotiable, and what makes the next horizon an easier approval than the current one.</p>
+
+  <div class="hz-grid ap">
+    <div class="hz-card h1">
+      <div class="hzc-label">Horizon 1</div>
+      <div class="hzc-period">Months 1–3</div>
+      <div class="hzc-name">Foundation &amp; Compliance</div>
+      <div class="hzc-delivered">Delivered</div>
+      <div class="hzc-items">
+        <div class="hzc-item">GCP infrastructure — Terraform, VPC-SC, IAM, CMEK, all security controls live</div>
+        <div class="hzc-item">HITL framework — state machine + Firestore audit store deployed and tested</div>
+        <div class="hzc-item">XAI layer — SHAP integrated on all 3 existing production ML models</div>
+        <div class="hzc-item">Model Cards — Article 11 documentation complete for all 3 models</div>
+        <div class="hzc-item">Unified asset telemetry pipeline — 6 regional systems on one schema</div>
+        <div class="hzc-item">Salesforce Developer Edition — integration live and tested</div>
+      </div>
+      <div class="hzc-feels">
+        <strong>Who feels it first</strong>
+        CCO (S-02) — compliance posture established before Q2 2026 review. Enterprise Architect (S-08) — entire infrastructure in code for the first time.
+      </div>
+      <div class="hzc-gate"><strong>Why H1 must come first:</strong> The Vertex AI Feature Store, VPC-SC perimeter, and Pub/Sub event bus provisioned in H1 are architectural prerequisites for every H2 module. ContractGuard and RevRec AI cannot be deployed onto infrastructure that does not exist — and cannot be trusted by Finance until the HITL framework has been running and accumulating audit records in production. H1 is not a setup cost. It is the proof-of-platform that makes H2 a feature deployment, not a system build.</div>
+    </div>
+
+    <div class="hz-card h2">
+      <div class="hzc-label">Horizon 2</div>
+      <div class="hzc-period">Months 4–8</div>
+      <div class="hzc-name">Core Module Deployment</div>
+      <div class="hzc-delivered">Delivered</div>
+      <div class="hzc-items">
+        <div class="hzc-item">ContractGuard — clause scoring + Legal HITL operational</div>
+        <div class="hzc-item">RevRec AI — ASC 606 classification + Finance Controller HITL + SAP write</div>
+        <div class="hzc-item">Asset IQ — RUL model + fleet anomaly detection in production</div>
+        <div class="hzc-item">FinRisk Sentinel — streaming anomaly monitoring live</div>
+        <div class="hzc-item">Vertex AI MLOps — pipelines, drift detection, Model Registry for all new models</div>
+        <div class="hzc-item">Module dashboards — UI for all four deployed modules</div>
+      </div>
+      <div class="hzc-feels">
+        <strong>Who feels it first</strong>
+        Finance Controller — first month-end close with ML-assisted classification, SHAP context, and 90-second HITL approval per transaction. Field Service Manager — first predictive maintenance alert with sensor attribution and cross-regional fleet view.
+      </div>
+      <div class="hzc-gate"><strong>Why H2 must follow H1:</strong> RevRec AI and ContractGuard depend on the Vertex AI Feature Store (H1 deliverable) for online feature serving. Their HITL checkpoints depend on the HITL framework (H1 deliverable) being proven in production — Finance and Legal will not trust a HITL workflow that went live the same day as the model. The HITL override rate data accumulated in H1 is the evidence base that determines H2's confidence thresholds. H2 modules are features on a proven platform, not a new system.</div>
+    </div>
+
+    <div class="hz-card h3">
+      <div class="hzc-label">Horizon 3</div>
+      <div class="hzc-period">Months 9–18</div>
+      <div class="hzc-name">Full AS Suite &amp; Optimisation</div>
+      <div class="hzc-delivered">Delivered</div>
+      <div class="hzc-items">
+        <div class="hzc-item">CCAI Sales Agent — full ADK deployment, Salesforce integration, AE escalation flow</div>
+        <div class="hzc-item">GreenOps Platform — carbon-aware scheduling, ESG metrics, CSRD reporting</div>
+        <div class="hzc-item">Strategy Dashboard — C-suite unified view across all 8 modules</div>
+        <div class="hzc-item">Data Governance module — quality, lineage, schema validation</div>
+        <div class="hzc-item">Cross-module optimisation — shared feature pipelines, joint drift monitoring</div>
+        <div class="hzc-item">EU AI Act full compliance certification readiness</div>
+      </div>
+      <div class="hzc-feels">
+        <strong>Who feels it first</strong>
+        Account Executive — first deal where the Sales Agent handled qualification and the AE entered with a complete briefing, BOM validated, and Opportunity already created. CTO (S-01) — Strategy Dashboard provides the unified cross-module view that was previously 4 manual data pulls.
+      </div>
+      <div class="hzc-gate"><strong>Why H3 is a lower-risk approval than H1:</strong> By month 9, Finance and Legal have experienced the HITL workflow for 5+ months. The HITL override rate metric shows the organisation's trust trajectory. H3 modules (Sales Agent, GreenOps) are lower-risk because the organisation has internalised the pattern — agents present their reasoning, humans approve consequential actions, the audit trail is immutable. The AS is no longer a proposition. It is an established practice.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §04 ADOPTION RISKS ── -->
+<section class="sec alt ap" id="risks">
+  <div class="s-ey re">Adoption Risks</div>
+  <h2 class="s-h2">Four risks. <em>Each with an architectural mitigation.</em></h2>
+  <p class="s-p">These are the risks that cause enterprise AI programmes to stall or fail — not the technical risks (those are addressed in the architecture on Pages 03–07) but the organisational and process risks that no diagram can eliminate on its own. Each one has a specific architectural design decision that reduces it.</p>
+
+  <div class="risk-grid ap">
+    <div class="risk-card">
+      <div class="rc-label">Risk 01 — Change Management</div>
+      <div class="rc-title">The Finance team has been doing this manually for fifteen years</div>
+      <div class="rc-risk">The Finance Controller and their team have fifteen years of muscle memory around manual ASC 606 classification. An AI system that replaces their judgment without warning will be rejected — not because the model is wrong, but because it bypasses the trust-building process entirely. This is the most common failure mode in enterprise AI adoption and it is never solved by better accuracy metrics.</div>
+      <div class="rc-mit-label">Architectural mitigation</div>
+      <div class="rc-mit">The HITL framework (Page 04, §07) is the change management strategy encoded in architecture. RevRec AI never posts to SAP without Finance Controller approval — not in Horizon 2, not in Horizon 3, not ever. The model earns trust by presenting its reasoning (SHAP explanation, comparable transactions, confidence score) and waiting for human confirmation. The HITL override rate metric (tracked in Vertex AI Monitoring) is the adoption progress indicator — as overrides decline, trust is growing. The transition from human-in-the-loop to human-on-the-loop happens at the Finance team's pace, not the project plan's.</div>
+      <div class="rc-arch-ref">HITL-04 · Page 04 · Vertex AI Monitoring · Drift Detection Page 06</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="rc-label">Risk 02 — Data Quality</div>
+      <div class="rc-title">Six regional asset systems with no common schema and unknown data quality</div>
+      <div class="rc-risk">The Asset IQ module depends on telemetry from 6 regional systems that have never been unified. The assumption that these systems produce clean, consistent, complete data is almost certainly wrong. A model trained on clean demo data that fails on live production telemetry destroys trust faster than no model at all — and in a regulated medical device context, a false negative on a failure prediction has patient safety implications.</div>
+      <div class="rc-mit-label">Architectural mitigation</div>
+      <div class="rc-mit">The Horizon 1 data fabric deliverable (Page 03, Phase F) is specifically sequenced to address this before any ML model touches production data. The Pub/Sub ingestion pipeline with schema validation, the Data Governance module with quarantine logic, and the Feature Store lineage tags are all Horizon 1 — not Horizon 2. The Asset IQ RUL model is not deployed until the Vertex AI Feature Store can demonstrate that every feature value has a validated source event behind it. The data quality score threshold for inclusion in ML pipelines (FRD-07, Page 04) must be met before training begins — not after deployment reveals the problem.</div>
+      <div class="rc-arch-ref">FRD-07 · Page 04 · Data Governance · Feature Store lineage · Page 06</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="rc-label">Risk 03 — Regulatory Approval Timeline</div>
+      <div class="rc-title">EU AI Act Annex III compliance cannot be certified on the day of the review</div>
+      <div class="rc-risk">EU AI Act compliance is not a box to tick before a regulatory review — it is a documented posture that must be demonstrable at any point in time. A compliance dashboard that went green two days before the Q2 2026 review will not satisfy an auditor. The audit trail, the HITL records, the Model Cards, and the SHAP explanations need to have been accumulating for long enough to be credible as a systematic practice, not an emergency preparation.</div>
+      <div class="rc-mit-label">Architectural mitigation</div>
+      <div class="rc-mit">The Horizon 1 sequencing places the compliance infrastructure — HITL framework, XAI layer, Model Cards — at the start of the programme, not at the end. By the time the Q2 2026 review arrives, the HITL audit trail will have months of immutable records in Firestore and BigQuery, the SHAP explanations will have been running on every production inference, and the Model Cards will have been through at least one HITL-11 promotion review. The compliance posture is established through consistent architectural practice — not through documentation written the week before the review.</div>
+      <div class="rc-arch-ref">HITL-11 · Model Cards · Page 06 · EU AI Act Art. 9 · Horizon 1 sequencing · Page 03</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="rc-label">Risk 04 — Integration Complexity</div>
+      <div class="rc-title">Salesforce and SAP integrations are where enterprise AI projects go to die</div>
+      <div class="rc-risk">The AS touches two of the most complex enterprise systems in existence — Salesforce CPQ and SAP S/4HANA. Integration projects involving these systems are notorious for scope creep, timeline overruns, and late-discovered data model mismatches. A real-time ML inference layer that depends on both systems for input data and writes back to both for outputs has a high surface area for integration failure.</div>
+      <div class="rc-mit-label">Architectural mitigation</div>
+      <div class="rc-mit">Three design decisions directly address this. First, ADR-001 (Salesforce Developer Edition REST API) means the Salesforce integration is validated in a free, permanent sandbox before any production credentials are involved — integration failures are discovered in dev, not in front of the CCO. Second, the SAP write for RevRec AI is the only irreversible AS action, and it is protected by a mandatory HITL approval record ID as a parameter — the integration cannot be called without a documented human decision preceding it. Third, the Pub/Sub event fabric (ADR-006) decouples the AS from both systems — the AS reads events from topics, not from direct system APIs, which means a Salesforce or SAP outage does not cascade into AS failures.</div>
+      <div class="rc-arch-ref">ADR-001 · ADR-006 · Page 03 · SAP write guard · Page 05</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── §05 ADR-016 ── -->
+<section class="sec ap" id="adr">
+  <div class="s-ey te">Architecture Decision Record</div>
+  <h2 class="s-h2">One adoption decision worth <em>documenting.</em></h2>
+  <p class="s-p">Only one adoption decision rises to the level of an ADR — the phased delivery approach itself. Every other commercial decision (pricing, packaging, sales motion) belongs to ClaraVis's commercial team, not the architecture record.</p>
+
+  <div class="adr-single ap">
+    <div class="adr-id">ADR-016 · Phase GTM Design</div>
+    <div class="adr-title">Phased adoption over big-bang full-suite deployment</div>
+
+    <div class="adr-section">Decision</div>
+    <div class="adr-text">Deploy the AS in three independent horizons, each delivering standalone value before the next begins. H1 delivers the compliance infrastructure and data foundation. H2 delivers the four core business modules on that proven foundation. H3 delivers the full suite on the established platform. The phased approach is the only viable deployment pattern given the constraints: EU AI Act Q2 2026 deadline, limited internal change management capacity, two complex legacy system integrations, and nine stakeholders with different adoption readiness levels.</div>
+
+    <div class="adr-section">Alternatives Rejected</div>
+    <div class="adr-rejected">Full AS suite deployed as a single programme: rejected for three reasons. (1) The EU AI Act Q2 2026 deadline cannot wait for the full programme to complete — the compliance infrastructure must be live well before the review, not at the same time as all eight modules. (2) Change management load across all nine stakeholders simultaneously is organisationally untenable — Finance, Legal, Field Service, and Sales cannot all be onboarded to new AI-assisted workflows in the same sprint. (3) If the programme stalls at any point, there is no partial value delivered — the entire investment is at risk. A single-programme failure is binary. A phased programme failure after H1 delivers a compliant, infrastructure-complete organisation regardless.</div>
+
+    <div class="adr-section">Consequences</div>
+    <div class="adr-consequences">The phased approach requires that the Horizon 1 infrastructure is designed to support H2 and H3 modules from the start — not retrofitted later. This is why the Terraform modules, VPC-SC perimeter, Vertex AI Feature Store, and Pub/Sub event bus are H1 deliverables even though they are not user-visible. The architecture absorbs the upfront design cost in exchange for eliminating the integration risk that big-bang deployments accumulate at the end. Every subsequent horizon is an extension of a proven platform, not a new system. The consequence of phasing is also a constraint on H1 scope: every H1 architectural decision must be evaluated against its ability to support H2 and H3 without redesign — this is the origin of ADR-002 (augment, never replace) and the shared Pub/Sub event fabric in ADR-006.</div>
+
+    <div class="adr-status">Accepted · Phase GTM Design</div>
+  </div>
+</section>
+
+<!-- ── BRIDGE ── -->
+<div class="bridge ap">
+  <div>
+    <div class="br-label">Portfolio Status</div>
+    <div class="br-h">Adoption Architecture complete.<br><strong>Eight pages. One system.</strong></div>
+    <p class="br-p">Pages 01–08 constitute a complete enterprise architecture portfolio: strategy and stakeholder analysis, TOGAF phases A–G, agent swarm design, ML engineering, infrastructure as code, and adoption architecture. Each page is a standalone artifact and a linked node in a traceable architecture record.</p>
+  </div>
+  <div class="pages">
+    <a href="page-07.html" class="pg-link">
+      <div class="pl-n">PG 07</div>
+      <div><div class="pl-title">← Infrastructure &amp; GCP Architecture</div><div class="pl-sub">The platform this adoption strategy runs on</div></div>
+      <div class="pl-arr">→</div>
+    </a>
+    <a href="index.html" class="pg-link">
+      <div class="pl-n">INDEX</div>
+      <div><div class="pl-title">← Portfolio Overview</div><div class="pl-sub">Return to the full portfolio index</div></div>
+      <div class="pl-arr">→</div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-brand">The <em>Autonomous</em> Seller</div>
+  <div class="ft-copy">© 2026 Siddharth Rao</div>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function t(){c.style.left=mx+'px';c.style.top=my+'px';rx+=(mx-rx)*.1;ry+=(my-ry)*.1;r.style.left=rx+'px';r.style.top=ry+'px';requestAnimationFrame(t)})();
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in')}),{threshold:.05});
+document.querySelectorAll('.ap').forEach(el=>io.observe(el));
+const secs=['argument','buyer-map','horizons','risks','adr'];
+const sio=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.sn').forEach(l=>l.classList.remove('act'));
+      const link=document.querySelector(`.sn[data-sec="${e.target.id}"]`);
+      if(link)link.classList.add('act');
+    }
+  });
+},{threshold:.2,rootMargin:'-80px 0px -60% 0px'});
+secs.forEach(id=>{const el=document.getElementById(id);if(el)sio.observe(el)});
+</script>
+</body>
+</html>
