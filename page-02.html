@@ -784,54 +784,6 @@ footer{background:var(--ink-2);padding:36px var(--col) 28px;border-top:1px solid
             <td><span class="rc rc-r">R</span></td>
             <td><span class="rc rc-c">C</span></td>
           </tr>
-          <tr>
-            <td>FinRisk Sentinel</td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-r">R</span></td>
-            <td><span class="rc rc-c">C</span></td>
-          </tr>
-          <tr>
-            <td>GreenOps Platform</td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-r">R</span></td>
-            <td><span class="rc rc-c">C</span></td>
-          </tr>
-          <tr>
-            <td>Data Governance</td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-r">R</span></td>
-            <td><span class="rc rc-a">A</span></td>
-          </tr>
-          <tr>
-            <td>Strategy Dashboard</td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-a">A</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-c">C</span></td>
-            <td><span class="rc rc-i">I</span></td>
-            <td><span class="rc rc-r">R</span></td>
-            <td><span class="rc rc-c">C</span></td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -1121,8 +1073,7 @@ footer{background:var(--ink-2);padding:36px var(--col) 28px;border-top:1px solid
         <tr><td><div class="rid br">BR-05</div></td><td>Contract clause intelligence and risk scoring</td><td>Every inbound contract must be analysed at clause level — liability caps, indemnification, governing law, IP ownership — with non-standard terms flagged to Legal with a risk score, precedent references, and a draft counter-position before any countersigning event.</td><td><span class="mos mM">Must</span></td><td><div class="rmod">ContractGuard</div></td><td><div class="raised-by">S-07 · S-04</div></td></tr>
         <tr><td><div class="rid br">BR-06</div></td><td>Data sovereignty — no data leaves EU boundary</td><td>All PII, PHI, device configuration data, and commercially sensitive contract data must remain within the EU GCP region boundary. This is a hard constraint from the CISO and a GDPR requirement. Enforcement must be architectural — VPC-SC — not policy-based.</td><td><span class="mos mM">Must</span></td><td><div class="rmod">Layer 04 Infrastructure · VPC-SC</div></td><td><div class="raised-by">S-09 · S-02</div></td></tr>
         <tr><td><div class="rid br">BR-07</div></td><td>CCAI Sales Agent for inbound MRI inquiries</td><td>An intelligent sales agent must handle the first stages of an inbound MRI inquiry autonomously — qualification, clinical configuration fit, pricing estimate — and escalate to a Senior AE with a full briefing document when commercial terms are required. Autonomy boundary specified in HITL spec.</td><td><span class="mos mS">Should</span></td><td><div class="rmod">CCAI Sales Agent · Salesforce Integration</div></td><td><div class="raised-by">S-04 · S-05</div></td></tr>
-        <tr><td><div class="rid br">BR-08</div></td><td>Executive strategy dashboard with OKR visibility</td><td>C-suite requires a unified view of portfolio performance — pipeline health, asset fleet status, revenue recognition posture, compliance status — in a single dashboard. Current state requires pulling from Salesforce, SAP, and six regional systems manually.</td><td><span class="mos mS">Should</span></td><td><div class="rmod">Strategy Dashboard · BigQuery</div></td><td><div class="raised-by">S-01 · S-03</div></td></tr>
-      </tbody>
+       </tbody>
     </table>
   </div>
 
@@ -1232,7 +1183,7 @@ footer{background:var(--ink-2);padding:36px var(--col) 28px;border-top:1px solid
 <!-- ── §06 USE CASES ── -->
 <section class="sec ap" id="usecases">
   <div class="s-ey">Use Case Catalogue</div>
-  <h2 class="s-h2">Eight flagship use cases — <em>one per module.</em></h2>
+  <h2 class="s-h2">Four flagship use cases — <em>one per module.</em></h2>
   <p class="s-p">Each use case is a specific, demonstrable capability the AS delivers for ClaraVis. Every card includes the EU AI Act risk classification and the specific architectural constraint the AS satisfies to meet it.</p>
 
   <div class="uc-grid ap">
@@ -1272,47 +1223,12 @@ footer{background:var(--ink-2);padding:36px var(--col) 28px;border-top:1px solid
       <span class="uc-risk risk-hi">EU AI Act — High Risk</span>
       <div class="uc-constraint"><strong>Architectural constraint satisfied</strong>HITL-06: work orders below confidence threshold route to FSM HITL — no autonomous work order creation below threshold. SHAP sensor attribution per alert. Unified Pub/Sub schema validated before BigQuery write. EU AI Act Annex III · Art. 14.</div>
     </div>
-    <div class="uc">
-      <div class="uc-id">UC-05</div>
-      <div class="uc-module">FinRisk Sentinel</div>
-      <div class="uc-title">Real-time financial anomaly detection with CFO alert</div>
-      <div class="uc-prob">Unusual payment patterns, revenue posting anomalies, and warranty reserve movements are detected weeks after occurrence. FinRisk monitors the financial event stream in real time and surfaces anomalies with full context before they compound.</div>
-      <div class="uc-sh">CFO · S-03</div>
-      <span class="uc-risk risk-hi">EU AI Act — High Risk</span>
-      <div class="uc-constraint"><strong>Architectural constraint satisfied</strong>HITL-08: high-severity anomalies route to CFO + Finance Controller simultaneously. SHAP explanation available for every anomaly above alert threshold. False positive feedback retrains anomaly baseline. EU AI Act Annex III · Art. 14.</div>
-    </div>
-    <div class="uc">
-      <div class="uc-id">UC-06</div>
-      <div class="uc-module">GreenOps Platform</div>
-      <div class="uc-title">Carbon-aware GCP workload scheduling for ESG reporting</div>
-      <div class="uc-prob">ClaraVis is required to report Scope 3 emissions from cloud operations under EU CSRD. GreenOps schedules compute-intensive ML training workloads to align with low-carbon electricity grid windows and generates auditable ESG metrics.</div>
-      <div class="uc-sh">CTO · S-01</div>
-      <span class="uc-risk risk-lo">EU AI Act — Minimal Risk</span>
-      <div class="uc-constraint"><strong>Architectural constraint satisfied</strong>GCP Carbon Footprint API feeds scheduling decisions. Carbon savings written to BigQuery ESG dataset with resource label taxonomy for FinOps cross-reference. Monthly CSRD report auto-generated. No HITL required — scheduling decisions are reversible and non-high-risk.</div>
-    </div>
-    <div class="uc">
-      <div class="uc-id">UC-07</div>
-      <div class="uc-module">Data Governance</div>
-      <div class="uc-title">Automated data quality validation with lineage tracking</div>
-      <div class="uc-prob">Salesforce, SAP, and asset telemetry data arrive with inconsistent schemas, missing fields, and duplicate records. Data Governance validates, enriches, and lineage-tags every record entering the AS fabric before it reaches any ML model.</div>
-      <div class="uc-sh">Enterprise Architect · S-08</div>
-      <span class="uc-risk risk-lo">EU AI Act — Minimal Risk</span>
-      <div class="uc-constraint"><strong>Architectural constraint satisfied</strong>Schema validation on every Pub/Sub message before BigQuery write. Malformed records quarantined, not dropped. Every record carries lineage tag: source system, ingestion timestamp, schema version, quality score. Records below quality threshold excluded from ML feature pipelines until reviewed. AR-11 · AR-12.</div>
-    </div>
-    <div class="uc">
-      <div class="uc-id">UC-08</div>
-      <div class="uc-module">Strategy Dashboard</div>
-      <div class="uc-title">Unified C-suite view — pipeline, assets, compliance, revenue</div>
-      <div class="uc-prob">C-suite visibility requires pulling from Salesforce, SAP, and six regional systems manually. The Strategy Dashboard unifies pipeline health, fleet status, revenue recognition posture, and EU AI Act compliance status in a single real-time view.</div>
-      <div class="uc-sh">CTO · CFO · S-01 · S-03</div>
-      <span class="uc-risk risk-lo">EU AI Act — Minimal Risk</span>
-      <div class="uc-constraint"><strong>Architectural constraint satisfied</strong>Single BigQuery dataset aggregating all 8 AS modules — no module-specific logins. EU AI Act compliance status green/amber/red per model based on HITL checkpoint completion rate and SHAP coverage. Pipeline health pulls from Salesforce via AS Pub/Sub integration. BR-08 · AR-11.</div>
-    </div>
+    
   </div>
 
   <div style="margin-top:4px;background:var(--cream-3);padding:16px 20px;border:1px solid var(--rule)">
     <div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Full Use Case Catalogue</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text-2)">The full catalogue — covering every use case the AS addresses for ClaraVis across all 8 modules, with complete stakeholder mapping, regulatory classification, and MoSCoW priority — is maintained as a living backlog in the repository.</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-2)">The full catalogue — covering every use case the AS addresses for ClaraVis across all 4 modules, with complete stakeholder mapping, regulatory classification, and MoSCoW priority — is maintained as a living backlog in the repository.</div>
   </div>
 </section>
 
